@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags %}
+{% load wagtailimages_tags %}
+
+{% block content %}
+<!-- <div class="bg-neutral-900"> -->
+<div class="home-container">
+    <h1 class="home-block-main">{{ page.title }}</h1>
+    {% if page.subheading %}
+        <p class="subheading home-block-main">{{ page.subheading }}</p>
+    {% endif %}
+
+    <div class="home-blocks home-block-elements">
+        {% for block in page.blocks.all %}
+            <div class="home-block home-block-cell">
+                <div class="home-block-content">
+                    <h2>{{ block.title }}</h2>
+                    {{ block.text|richtext }}
+                </div>
+                {% if block.image %}
+                    <div class="home-block-image">
+                        {% image block.image width-400 as img %}
+                        <img src="{{ img.url }}" alt="{{ block.title }}" loading="lazy">
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

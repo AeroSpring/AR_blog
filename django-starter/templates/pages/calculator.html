@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load wagtailsettings_tags %}
+{% get_settings %}
+
+{% block content %}
+<div class="calculator-container">
+    <h1>Расчет стоимости работ</h1>
+    <p class="text-muted">Выберите необходимые услуги, и мы рассчитаем примерную стоимость и сроки.</p>
+
+    <form id="calculator-form">
+        <div class="table-responsive">
+            <table class="calculator-table">
+                <thead>
+                    <tr>
+                        <th>Услуга</th>
+                        <th>Дни (от – до)</th>
+                        <th>Стоимость (от – до)</th>
+                        <th>Выбрать</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for service in services %}
+                    <tr>
+                        <td>{{ service.name }}</td>
+                        <td>{{ service.days_min }} – {{ service.days_max }}</td>
+                        <td class="cost-cell">
+                            {% widthratio service.days_min 1 cost_per_day as cost_min %}
+                            {% widthratio service.days_max 1 cost_per_day as cost_max %}
+                            {{ cost_min|floatformat:0 }} – {{ cost_max|floatformat:0 }} ₽
+                        </td>
+                        <td>
+                            <input type="checkbox" class="service-checkbox"
+                                   data-cost-min="{{ cost_min }}"
+                                   data-cost-max="{{ cost_max }}"
+                                   data-days-min="{{ service.days_min }}"
+                                   data-days-max="{{ service.days_max }}">
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">Нет активных услуг. Добавьте их в админке.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="total-row">
+            <div>
+                <span class="total-label">Итого:</span>
+                <span class="total-item">
+                    Дни: <strong id="total-days-min">0</strong> – <strong id="total-days-max">0</strong>
+                </span>
+                <span class="total-item">
+                    Стоимость: <strong id="total-cost-min">0</strong> – <strong id="total-cost-max">0</strong> ₽
+                </span>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.service-checkbox');
+    const totalDaysMin = document.getElementById('total-days-min');
+    const totalDaysMax = document.getElementById('total-days-max');
+    const totalCostMin = document.getElementById('total-cost-min');
+    const totalCostMax = document.getElementById('total-cost-max');
+
+    function updateTotals() {
+        let daysMin = 0, daysMax = 0, costMin = 0, costMax = 0;
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                daysMin += parseInt(cb.dataset.daysMin) || 0;
+                daysMax += parseInt(cb.dataset.daysMax) || 0;
+                costMin += parseFloat(cb.dataset.costMin) || 0;
+                costMax += parseFloat(cb.dataset.costMax) || 0;
+            }
+        });
+        totalDaysMin.textContent = daysMin;
+        totalDaysMax.textContent = daysMax;
+        totalCostMin.textContent = costMin.toFixed(0);
+        totalCostMax.textContent = costMax.toFixed(0);
+    }
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', updateTotals);
+    });
+
+    // Первоначальный расчёт
+    updateTotals();
+});
+</script>
+{% endblock %}

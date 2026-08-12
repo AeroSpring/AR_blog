@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="reviews-container">
+    <h1 class="review-block">Отзывы</h1>
+    
+    <div class="reviews-filters">
+        <span>Фильтр по рейтингу:</span>
+        <a href="{% url 'pages:reviews' %}" class="filter-link {% if not current_rating %}active{% endif %}">Все</a>
+        {% for i in "54321"|make_list %}
+            <a href="{% url 'pages:reviews' %}?rating={{ i }}" 
+            class="filter-link {% if current_rating == i %}active{% endif %}">
+                {% for star in "12345"|make_list %}{% if forloop.counter <= i|add:0 %}★{% else %}☆{% endif %}{% endfor %}
+            </a>
+        {% endfor %}
+    </div>
+
+    {% if reviews %}
+        <ul class="review-list">
+        {% for review in reviews %}
+            <li class="review-item">
+                <div class="review-header">
+                    <strong>{{ review.user.get_full_name|default:review.user.username }}</strong>
+                    <span class="review-rating">
+                        {% for i in "12345"|make_list %}
+                            {% if forloop.counter <= review.rating %}⭐{% else %}☆{% endif %}
+                        {% endfor %}
+                    </span>
+                    <span class="review-date">{{ review.created_at|date:"d.m.Y H:i" }}</span>
+                </div>
+                <div class="review-text">{{ review.text|linebreaks }}</div>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Пока нет отзывов. Будьте первым!</p>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        <div class="review-form-wrapper">
+            <!-- <h3>Оставить отзыв</h3> -->
+            <!-- <a>&emsp;</a> -->
+
+            <form method="post" id="review-form">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="{{ form.text.id_for_label }}">Ваш отзыв</label>
+                    {{ form.text }}
+                    {{ form.text.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label>Оценка</label>
+                    <div class="star-rating" id="star-rating" data-rating="{{ form.rating.value|default:1 }}">
+                        <span class="star" data-value="1">☆</span>
+                        <span class="star" data-value="2">☆</span>
+                        <span class="star" data-value="3">☆</span>
+                        <span class="star" data-value="4">☆</span>
+                        <span class="star" data-value="5">☆</span>
+                    </div>
+                    <input type="hidden" name="rating" id="id_rating" value="{{ form.rating.value|default:1 }}">
+                    {{ form.rating.errors }}
+                </div>
+
+                <button type="submit" class="btn-primary  my-custom-button">Отправить отзыв</button>
+            </form>
+
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const container = document.getElementById('star-rating');
+                const stars = container.querySelectorAll('span');
+                const hiddenInput = document.getElementById('id_rating');
+                let currentRating = parseInt(container.dataset.rating) || 1;
+
+                function updateStars(rating) {
+                    stars.forEach((star, index) => {
+                        if (index < rating) {
+                            star.textContent = '★';
+                            star.style.color = '#f5b342';
+                        } else {
+                            star.textContent = '☆';
+                            star.style.color = '#d3d3d3';
+                        }
+                    });
+                    hiddenInput.value = rating;
+                }
+
+                stars.forEach(star => {
+                    star.addEventListener('click', function() {
+                        const value = parseInt(this.dataset.value);
+                        currentRating = value;
+                        updateStars(value);
+                    });
+                    star.addEventListener('mouseenter', function() {
+                        const value = parseInt(this.dataset.value);
+                        updateStars(value);
+                    });
+                    star.addEventListener('mouseleave', function() {
+                        updateStars(currentRating);
+                    });
+                });
+
+                // Инициализация
+                updateStars(currentRating);
+            });
+            </script>
+
+        </div>
+    {% else %}
+        <p><a href="{% url 'account_login' %}?next={{ request.path }}">Войдите</a>, чтобы оставить отзыв.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+

@@ -1,0 +1,55 @@
+{% load comment_tags %}
+{% load static %}
+
+<li id="comment-{{ comment.id }}" class="comment-item">
+    <div class="comment-meta">
+        <strong>{{ comment.author.get_full_name|default:comment.author.username }}</strong>
+        <span class="comment-date">{{ comment.created_at|date:"d.m.Y H:i" }}</span>
+        {% if comment.updated_at != comment.created_at %}
+            <span class="comment-edited">(ред.)</span>
+        {% endif %}
+    </div>
+    <div class="comment-text">{{ comment.text|linebreaks }}</div>
+
+    <!-- Лайки -->
+    {% if request.user.is_authenticated %}
+        {% if request.user != comment.author %}
+            <a href="{% url 'comments:toggle_like' comment.id %}?page={{ request.GET.page }}" 
+               class="like-btn {% if comment|is_liked_by:request.user %}liked{% endif %}"
+               title="Лайкнуть">
+                👍 <span class="like-count">{{ comment.comment_likes.count }}</span>
+            </a>
+        {% else %}
+            <span class="like-btn disabled" title="Вы не можете лайкать свой комментарий">
+                👍 <span class="like-count">{{ comment.comment_likes.count }}</span>
+            </span>
+        {% endif %}
+    {% else %}
+        <span class="like-btn disabled" title="Войдите, чтобы лайкать">
+            👍 <span class="like-count">{{ comment.comment_likes.count }}</span>
+        </span>
+    {% endif %}
+    
+    <div class="comment-actions">
+        <!-- <a>&emsp;</a> -->
+        <button class="quote-btn my-custom-button" data-comment-id="{{ comment.id }}" data-author="{{ comment.author.username }}" data-text="{{ comment.text|escapejs }}">
+            Цитировать
+        </button>
+
+        {# Кнопки редактирования/удаления – только для автора #}
+        {% if request.user == comment.author %}
+            <a href="{% url 'comments:edit_comment' comment.id %}?page={{ request.GET.page }}" class="edit-btn">Редактировать</a>
+            <a href="{% url 'comments:delete_comment' comment.id %}?page={{ request.GET.page }}" class="delete-btn">Удалить</a>
+        {% endif %}
+    </div>
+
+    <!-- Цитата комментария -->
+    {% if comment.replies.all %}
+        <a>&emsp;</a>
+        <ul class="replies">
+            {% for reply in comment.replies.all %}
+                {% include 'comments/comment_item.html' with comment=reply %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+</li>

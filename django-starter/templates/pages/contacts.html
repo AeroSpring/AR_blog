@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load wagtailsettings_tags %}
+{% get_settings %}
+
+{% block content %}
+<div class="contacts-container contacts-block">
+    <h1>Контакты</h1>
+    <div class="contact-info contacts-fields-block">
+        <p><strong>E-mail:</strong> <a href="mailto:{{ settings.pages.ContactSettings.email }}">{{ settings.pages.ContactSettings.email }}</a></p>
+        <p><strong>Телефон:</strong> <a href="tel:{{ settings.pages.ContactSettings.phone }}">{{ settings.pages.ContactSettings.phone }}</a></p>
+    </div>
+    <hr>
+</div>
+{% endblock %}

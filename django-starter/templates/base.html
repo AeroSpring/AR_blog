@@ -1,0 +1,578 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ PROJECT_TITLE }}</title>
+    <!-- <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}"> -->
+    <link rel="icon" type="image/x-icon" href="{% static 'AI.ico' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <style>
+        /* Визуальный признак нажатой кнопки в хэдере */
+        header nav a.active {
+            border-bottom: 2px solid white;
+            /* или другой визуальный признак */
+        }
+
+
+        .home-blocks {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            margin-top: 30px;
+        }
+        .home-block {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 30px;
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 30px;
+            transition: box-shadow 0.2s;
+        }
+        .home-block-main{
+            text-align: center;
+            /* margin: 50px 0; */
+            margin-top: 50px;
+            margin-bottom: 45px;
+        }
+        .home-block-elements{
+            /* list-style: none; */
+            padding: 20px;
+        }
+        .home-block-cell{
+            /* background-color: #1f2937; */
+            background-color: #333a43;
+            color: #ffffff;
+            /* padding: 20px; */
+        }
+        .home-block:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .home-block-content {
+            flex: 2 1 300px;
+            /* background-color: #1f2937; */
+            background-color: #333a43;
+            color: #ffffff;
+        }
+        .home-block-content h2 {
+            margin-top: 0;
+            /* color: #1f2937; */
+            color: #ffffff;
+        }
+        .home-block-content p {
+            /* color: #4b5563; */
+            color: #cccccc;
+            /* color: #b7b7b7; */
+        }
+        .home-block-image {
+            flex: 1 1 200px;
+            text-align: center;
+        }
+        .home-block-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        /* Если блок без картинки — текст растягивается на всю ширину */
+        .home-block:has(.home-block-image) .home-block-content {
+            flex: 2;
+        }
+
+
+        .citate-margin {
+            margin: 10px 2px;
+            /* margin: 6px 1px 6px 1px; */
+            text-decoration: underline;
+        }
+
+        /* Уточняем класс кнопки через родительский body */
+        /* Добавляем body перед селектором, чтобы сделать его "сильнее" */
+        body button.my-custom-button {
+            display: inline-block;
+            background-color: #1f2937;
+            color: #ffffff;
+            padding: 7px 18px;
+            border: none;
+            border-radius: 4px;
+            font-size: 15px;
+            /* font-weight: bold; */
+            cursor: pointer;
+            outline: none;
+            transition: background-color 0.2s;
+        }
+        body button.my-custom-button:hover {
+            background-color: #171717;
+        }
+
+
+        /* Сброс маркеров списков */
+        .comment-list,
+        .replies {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        /* Каждый комментарий */
+        .comment-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        /* Блок ответов — отступ и линия */
+        .replies {
+            margin-left: 30px;       /* сдвиг вправо */
+            padding-left: 20px;      /* дополнительный воздух */
+            border-left: 2px solid #d0d0d0; /* линия, показывающая связь с родителем */
+            margin-top: 10px;
+        }
+
+        /* Можно сделать чуть светлее фон для ответов */
+        .replies .comment-item {
+            background-color: #f2f2f2;
+        }
+
+        /* Ещё более глубокий уровень */
+        .replies .replies {
+            margin-left: 25px;       /* чуть меньше, но сохраняем прогрессию */
+        }
+
+
+        .edit-btn, .delete-btn {
+            display: inline-block;
+            padding: 7px 18px;
+            margin-left: 8px;
+            border-radius: 4px;
+            font-size: 15px;
+            text-decoration: none;
+            /* border: 1px solid transparent; */
+            border: none;
+            transition: background-color 0.2s;
+        }
+        .edit-btn {
+            background-color: #1f2937;
+            color: #fff;
+        }
+        .edit-btn:hover {
+            background-color: #171717;
+            color: #fff;
+        }
+        .delete-btn {
+            background-color: #1f2937;
+            color: #fff;
+        }
+        .delete-btn:hover {
+            background-color: #171717;
+            color: #fff;
+        }
+        .comment-edited {
+            font-size: 15px;
+            color: #fff;
+            margin-left: 8px;
+        }
+
+
+        .like-btn {
+            display: inline-block;
+            padding: 4px 10px;
+            margin-left: 0px;
+            margin-top: 0px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        .like-btn:hover:not(.disabled) {
+            background-color: #dee2e6;
+        }
+        .like-btn.liked {
+            background-color: #1f2937;
+            color: #fff;
+        }
+        .like-btn.liked:hover:not(.disabled) {
+            background-color: #171717;
+        }
+        .like-btn.disabled {
+            opacity: 0.6;
+            cursor: default;
+            pointer-events: none; /* убираем кликабельность */
+        }
+        .like-count {
+            font-weight: bold;
+            margin-left: 4px;
+        }
+
+
+        /* Блок пагинации */
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        .pagination .step-links {
+            display: inline-block;
+        }
+
+        /* Ссылки как акцентные кнопки */
+        .pagination a {
+            display: inline-block;
+            padding: 6px 14px;
+            margin: 0 4px;
+            background-color: #1f2937;
+            color: #fff !important;
+            border-radius: 4px;
+            text-decoration: none !important;
+            font-weight: 500;
+            transition: background-color 0.15s;
+        }
+
+        /* Ховер для ссылок */
+        .pagination a:hover {
+            background-color: #171717;
+            text-decoration: none;
+        }
+
+        /* Текущая страница (не ссылка) */
+        .pagination .current {
+            display: inline-block;
+            padding: 6px 14px;
+            margin: 0 4px;
+            background-color: #e9ecef;
+            color: #333;
+            border-radius: 4px;
+        }
+
+        /* Можно добавить иконки-стрелки для "вперёд/назад" */
+        .pagination a:first-of-type::before {
+            content: "« ";
+        }
+        .pagination a:last-of-type::after {
+            content: " »";
+        }
+
+
+        /* Контактная информация */
+        .contacts-block{
+            text-align: center;
+        }
+        .contacts-fields-block{
+            margin-top: 50px;
+            margin-bottom: 70px;
+            text-align: center;
+        }
+
+
+        /* Отзывы */
+        .review-block{
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .review-list {
+            list-style: none;
+            /* padding-left: 0; */
+            padding: 20px;
+        }
+        .review-item {
+            background: #f9f9f9;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .review-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+        .review-rating {
+            color: #f5b342;
+            font-size: 1.1em;
+            letter-spacing: 2px;
+        }
+        .review-date {
+            font-size: 0.9em;
+            color: #777;
+            margin-left: auto;
+        }
+        .review-form-wrapper {
+            margin-top: 30px;
+            border-top: 1px solid #ddd;
+            padding: 20px;
+        }
+        .review-form-wrapper .rating-select {
+            width: auto;
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 8px;
+            margin: 8px 0;
+        }
+        .star {
+            font-size: 1.96rem;          /* размер увеличен с 2rem до 3rem */
+            cursor: pointer;          /* курсор-указатель при наведении */
+            color: #d3d3d3;           /* цвет неактивных звёзд */
+            transition: color 0.15s;
+            user-select: none;        /* чтобы текст не выделялся при клике */
+        }
+        .star.active,
+        .star:hover {
+            color: #f5b342;           /* золотой при наведении или активные */
+        }
+
+        .reviews-filters {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;  /* ← центр по горизонтали */
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .reviews-filters span {
+            font-weight: bold;
+            margin-right: 6px;
+        }
+        .filter-link {
+            padding: 6px 14px;
+            background-color: #e9ecef;
+            border-radius: 20px;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            font-size: 0.95rem;
+        }
+        .filter-link:hover {
+            background-color: #dee2e6;
+        }
+        .filter-link.active {
+            background-color: #1f2937;
+            color: #fff;
+            pointer-events: none; /* чтобы нельзя было кликнуть на активный */
+        }
+
+
+        /* ------ Калькулятор ------ */
+        .calculator-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px 10px;
+        }
+        .calculator-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .calculator-table th,
+        .calculator-table td {
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            text-align: left;
+            vertical-align: middle;
+        }
+        .calculator-table th {
+            background-color: #f2f2f2;
+            font-weight: 600;
+        }
+        .calculator-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .calculator-table .cost-cell {
+            white-space: nowrap;
+        }
+        .calculator-table input[type="checkbox"] {
+            transform: scale(1.3);
+            cursor: pointer;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        /* Итоговая строка */
+        .total-row {
+            margin-top: 30px;
+            padding: 20px 25px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            border-left: 4px solid #1f2937;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px 40px;
+        }
+        .total-row .total-label {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-right: 10px;
+        }
+        .total-row .total-item {
+            font-size: 1.05rem;
+        }
+        .total-row strong {
+            color: #1f2937;
+            font-weight: 700;
+        }
+        .text-muted {
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/htmx.org/dist/htmx.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const quoteButtons = document.querySelectorAll('.quote-btn');
+            const textarea = document.querySelector('textarea[name="text"]');
+            const parentInput = document.getElementById('parent_id');
+
+            quoteButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const author = this.dataset.author;
+                    // Получаем текст, который пришёл с экранированными символами
+                    let text = this.dataset.text;
+                    const commentId = this.dataset.commentId;
+
+                    // Убираем \u000D и \u000A (заменяем на пробелы)
+                    // Обрати внимание: это литералы, поэтому экранируем обратный слэш
+                    const cleanText = text.replace(/\\u000D|\\u005C|\\u0022|\\u000A/g, ' '); // весь цитируемый комментарий будет в строку
+                    // const cleanText = text.replace(/\\u000D|\\u005C|\\u0022|\\u000A/g, '\n'); // цитирование комментария с сохранением переносов
+
+                    // Формируем цитату без начального "> " и с автором
+                    const quoteText = `@${author}:\n${cleanText}\n\n`;
+
+                    // Вставляем в textarea (можно добавить в начало)
+                    if (textarea) {
+                        textarea.value = quoteText + textarea.value;
+                        textarea.focus();
+                    }
+                    // Устанавливаем parent_id
+                    if (parentInput) {
+                        parentInput.value = commentId;
+                    }
+                });
+            });
+        });
+    </script>
+
+    <style type="text/tailwindcss">
+        [x-cloak] { 
+            display: none !important; 
+        }
+        h1 {
+            @apply text-4xl font-bold mb-4
+        }
+        h2 {
+            @apply text-xl font-bold mb-2
+        }
+        p {
+            @apply mb-4
+        }
+        .button, button, [type='submit'], [type='button'] {
+            @apply bg-indigo-600 text-white font-bold px-6 py-4 inline-block 
+            rounded-lg shadow-lg transition-all cursor-pointer
+        }
+        .button:hover, button:hover, [type='submit']:hover, [type='button']:hover {
+            @apply bg-indigo-700
+        }
+        .button:active, button:active, [type='submit']:active, [type='button']:active {
+            @apply scale-95
+        }
+        .button.alert, button.alert {
+            @apply bg-red-700
+        }
+        .button.alert:hover, button.alert:hover {
+            @apply bg-red-600
+        }
+        .button-red {
+            @apply !bg-red-500 hover:!bg-red-600
+        }
+        .button-gray {
+            @apply !bg-gray-300 hover:!bg-[#c3c9d0]
+        }
+        .navitems>li>a {
+            @apply flex items-center gap-2 h-12 px-4 hover:bg-gray-700 rounded-lg;
+        }
+        .hoverlist>* {
+            @apply hover:bg-gray-100 rounded-md transition duration-150;
+        }
+        .hoverlist>*>a {
+            @apply flex items-center p-2;
+        }
+        .highlight {
+            @apply !bg-indigo-100;
+        }
+        .allauth content a {
+            @apply underline underline-offset-2
+        }
+        .allauth content a:hover {
+            @apply text-indigo-500
+        }
+        .allauth form[action="/accounts/signup/"] ul {
+            @apply hidden
+        }
+        .allauth form[action="/accounts/signup/"] ul.errorlist {
+            @apply block
+        }
+        .allauth .helptext {
+            @apply block mt-4
+        }
+        label {
+            @apply hidden
+        }
+        input[type=file] {
+            @apply bg-white pl-0
+        }
+        .textarea, textarea, input {
+            @apply w-full rounded-lg py-4 px-5 bg-gray-100
+        }
+        .errorlist li {
+            @apply p-1 pl-4 border-l-red-500 border-l-4 border-solid mb-2 text-red-500
+        }
+        label[for="id_remember"] {
+            @apply inline-block w-auto mr-2
+        }
+        input[name="remember"] {
+            @apply w-auto
+        }
+        .alert-info { @apply bg-blue-300 }
+        .alert-success { @apply bg-green-400 }
+        .alert-warning { @apply bg-amber-400 }
+        .alert-danger { @apply bg-amber-500 }
+        .article ifame {
+            width: 100%;
+            height: 470px;
+            border-radius: 12px;
+        }
+    </style>
+
+</head>
+<body class="{% block class %}{% endblock %}" hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
+	
+    {% include 'includes/messages.html' %}
+
+    {% include 'includes/header.html' %}
+
+    {% block layout %}
+        {% block content %}
+        {% endblock %}
+    {% endblock %}
+
+
+</body>
+</html>

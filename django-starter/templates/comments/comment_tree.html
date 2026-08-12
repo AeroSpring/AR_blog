@@ -1,0 +1,38 @@
+{% load comment_tags %}
+
+<div class="comments-section">
+    <a>&emsp;</a>
+    <h3>Комментарии ({{ article.comments.count }})</h3>
+    <a>&emsp;</a>
+
+    {% if page_obj %}
+        <ul class="comment-list">
+            {% for comment in page_obj %}
+                {% include 'comments/comment_item.html' with comment=comment %}
+                <!-- <a>&emsp;</a> -->
+            {% endfor %}
+        </ul>
+
+        {# Пагинатор #}
+        <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; первая</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">назад</a>
+                {% endif %}
+
+                <span class="current">
+                    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">вперёд</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">последняя &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    {% else %}
+        <p>Пока нет комментариев. Будьте первым!</p>
+        <a>&emsp;</a>
+    {% endif %}
+</div>
