@@ -22,7 +22,7 @@ WAGTAILIMAGES_PNG_COMPRESSION_LEVEL = 0
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-PROJECT_TITLE = "AI в вашем бизнесе"
+PROJECT_TITLE = "Дополненная реальность в вашем бизнесе"
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-rj#-z^kx3j+1ay397otg6j8m_8#v^$^$jys6&41vy^&6le)ezc'
@@ -190,7 +190,7 @@ SILENCED_SYSTEM_CHECKS = [
     'treebeard.E001',
 ]
 
-WAGTAIL_SITE_NAME = 'AI Blog'
+WAGTAIL_SITE_NAME = 'AR Blog'
 WAGTAILADMIN_BASE_URL = 'http://mywebsite.com'
 
 # Отключает принудительное сжатие (по умолчанию 85)
