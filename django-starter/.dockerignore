@@ -1,0 +1,15 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.git
+.gitignore
+README.md
+db.sqlite3
+media/
+staticfiles/
+.env
+.python-version
+pyproject.toml
+uv.lock
+data/
