@@ -1,23 +1,33 @@
 {% with request.resolver_match.url_name as url_name %}
-<header class="flex items-center justify-between bg-gray-800 h-20 px-8 text-white sticky top-0 z-40">
-
+<header class="flex items-center justify-between bg-gray-800 h-20 px-4 md:px-8 text-white sticky top-0 z-40">
+    
+    <!-- Логотип -->
     <div>
         <a class="flex items-center gap-2" href="/">
-            <!-- <img class="h-6" src="/static/images/logo.svg" alt="Logo"/> -->
-            <!-- <span class="text-lg font-bold">Дополненная реальность в вашем бизнесе</span> -->
             <img class="h-6" src="/static/images/QR_AR_logo_soft_256.png" alt="Logo"/>
-            <span class="text-lg font-bold">{{ PROJECT_TITLE }}</span>
+            <!-- <span class="text-lg font-bold hidden sm:inline">{{ PROJECT_TITLE }}</span> -->
         </a>
     </div>
 
-    <nav class="block relative">
-        <ul class="navitems flex items-center justify-center h-full">
+    <!-- Кнопка гамбургера (видна только на мобильных) -->
 
-            <li><a href="/">На главную</a></li>
+    <button @click="mobileMenuOpen = !mobileMenuOpen" 
+            class="md:hidden focus:outline-none">
+        <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M4 6h16M4 12h16M4 18h16" 
+                stroke="#ffffff" />   <!-- ← здесь задаём цвет явно -->
+        </svg>
+    </button>
+
+    <!-- Основное навигационное меню -->
+    <nav class="hidden md:block relative">
+        <ul class="navitems flex items-center justify-center h-full gap-4">
+            <li><a href="/" class="{% if url_name == 'home' %}active{% endif %}">На главную</a></li>
             <li><a href="{% url 'blog' %}" class="{% if url_name == 'blog' %}active{% endif %}">Статьи</a></li>
-            <li><a href="{% url 'pages:calculator' %}" class="{% if url_name == 'calculator' %}active{% endif %}">Расчет стоимости работ</a></li>
-            <li><a href="{% url 'pages:reviews' %}" class="{% if url_name == 'reviews' %}active{% endif %}">Отзывы</a></li>
+            <li><a href="{% url 'pages:calculator' %}" class="{% if url_name == 'calculator' %}active{% endif %}">Расчет стоимости</a></li>
             <li><a href="{% url 'pages:contacts' %}" class="{% if url_name == 'contacts' %}active{% endif %}">Контакты</a></li>
+            <li><a href="{% url 'pages:reviews' %}" class="{% if url_name == 'reviews' %}active{% endif %}">Отзывы</a></li>
 
             {% if request.user.is_authenticated %}
             <li x-data="{ dropdownOpen: false }" class="relative">
@@ -27,10 +37,9 @@
                     <img x-bind:class="dropdownOpen && 'rotate-180 duration-300'" class="w-4" src="https://img.icons8.com/small/32/777777/expand-arrow.png"/>
                 </a>
                 <div x-show="dropdownOpen" x-cloak class="absolute right-0 bg-white text-black shadow rounded-lg w-40 p-2 z-20"
-                x-transition:enter="duration-300 ease-out"
-                x-transition:enter-start="opacity-0 -translate-y-5 scale-90"
-                x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-                >
+                    x-transition:enter="duration-300 ease-out"
+                    x-transition:enter-start="opacity-0 -translate-y-5 scale-90"
+                    x-transition:enter-end="opacity-100 translate-y-0 scale-100">
                     <ul class="hoverlist [&>li>a]:justify-end">
                         <li><a href="{% url 'profile' %}">My Profile</a></li>
                         <li><a href="{% url 'profile-edit' %}">Edit Profile</a></li>
@@ -39,14 +48,38 @@
                     </ul>
                 </div>
             </li>
-            
             {% else %}
             <li><a href="{% url 'account_login' %}">Login</a></li>
             <li><a href="{% url 'account_signup' %}?next={% url 'profile-onboarding' %}">Signup</a></li>
             {% endif %}
-
         </ul>
     </nav>
+
+    <!-- Мобильное меню (выпадающее) -->
+    <div x-show="mobileMenuOpen" 
+         x-cloak 
+         class="absolute top-20 left-0 w-full bg-gray-800 p-4 md:hidden shadow-lg z-50"
+         x-transition:enter="duration-300 ease-out"
+         x-transition:enter-start="opacity-0 -translate-y-4"
+         x-transition:enter-end="opacity-100 translate-y-0">
+        <ul class="flex flex-col gap-2 text-center">
+            <li><a href="/" class="block py-2 hover:bg-gray-700 rounded-lg">На главную</a></li>
+            <li><a href="{% url 'blog' %}" class="block py-2 hover:bg-gray-700 rounded-lg">Статьи</a></li>
+            <li><a href="{% url 'pages:calculator' %}" class="block py-2 hover:bg-gray-700 rounded-lg">Расчет стоимости</a></li>
+            <li><a href="{% url 'pages:contacts' %}" class="block py-2 hover:bg-gray-700 rounded-lg">Контакты</a></li>
+            <li><a href="{% url 'pages:reviews' %}" class="block py-2 hover:bg-gray-700 rounded-lg">Отзывы</a></li>
+            <li><hr class="border-gray-600 my-2"></li>
+            {% if request.user.is_authenticated %}
+            <li><a href="{% url 'profile' %}" class="block py-2 hover:bg-gray-700 rounded-lg">Мой профиль</a></li>
+            <li><a href="{% url 'profile-edit' %}" class="block py-2 hover:bg-gray-700 rounded-lg">Редактировать</a></li>
+            <li><a href="{% url 'profile-settings' %}" class="block py-2 hover:bg-gray-700 rounded-lg">Настройки</a></li>
+            <li><a href="{% url 'account_logout' %}" class="block py-2 hover:bg-gray-700 rounded-lg">Выйти</a></li>
+            {% else %}
+            <li><a href="{% url 'account_login' %}" class="block py-2 hover:bg-gray-700 rounded-lg">Войти</a></li>
+            <li><a href="{% url 'account_signup' %}?next={% url 'profile-onboarding' %}" class="block py-2 hover:bg-gray-700 rounded-lg">Регистрация</a></li>
+            {% endif %}
+        </ul>
+    </div>
 
 </header>
 {% endwith %}

@@ -10,8 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 from PIL import ImageFile
+
+
 
 # Установка максимального качества и отключение оптимизации PNG при сохранении
 # 0 — минимальное сжатие (максимальное качество и скорость сохранения)
@@ -24,13 +27,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 PROJECT_TITLE = "Дополненная реальность в вашем бизнесе"
 
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-rj#-z^kx3j+1ay397otg6j8m_8#v^$^$jys6&41vy^&6le)ezc'
+# SECRET_KEY = 'django-insecure-rj#-z^kx3j+1ay397otg6j8m_8#v^$^$jys6&41vy^&6le)ezc'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
+# ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
+
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-...')   # прочитаем из переменной окружения
+# DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 'yes')
+ALLOWED_HOSTS = ['ar-to-business.ru', '159.194.205.233', 'localhost', '127.0.0.1']
+
 
 CSRF_TRUSTED_ORIGINS = ['https://*']
 
@@ -120,8 +129,7 @@ WSGI_APPLICATION = '_core.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
+# База данных – теперь в /data внутри контейнера
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -154,22 +162,21 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # LANGUAGE_CODE = 'en-us'
 LANGUAGE_CODE = 'ru-ru'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media' 
+
+# Статика – будет в томе для nginx
+STATIC_ROOT = '/app/staticfiles'
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [ BASE_DIR / 'static' ]
-
-MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media' 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

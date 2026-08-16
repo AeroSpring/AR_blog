@@ -1,51 +1,30 @@
 version: '3.8'
 
 services:
-  wagtail:
+  web:
     build: .
-    container_name: wagtail_site
-    restart: unless-stopped
-    command: gunicorn _core.wsgi:application --bind 0.0.0.0:8000
-    expose:
-      - "8000"
+    container_name: wagtail_web
+    volumes:
+      - ./:/app                    # монтируем всю папку проекта (база, медиа, код)
+      - static_volume:/app/staticfiles   # статика для nginx
     env_file:
       - .env
-    volumes:
-      - ./data/db:/app/db          # SQLite
-      - ./data/media:/app/media    # медиа
-      - ./data/static:/app/staticfiles
-    networks:
-      - wagtail_network
+    restart: unless-stopped
 
   nginx:
-    image: nginx:1.25-alpine
-    container_name: nginx
-    restart: unless-stopped
+    image: nginx:alpine
+    container_name: wagtail_nginx
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./data/static:/static:ro
-      - ./data/media:/media:ro
-      - ./data/certbot/conf:/etc/letsencrypt:ro
-      - ./data/certbot/www:/var/www/certbot:ro
+      - static_volume:/app/staticfiles:ro
+      - ./media:/app/media:ro      # монтируем медиа напрямую, чтобы nginx читал
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
-      - wagtail
-    networks:
-      - wagtail_network
-
-  certbot:
-    image: certbot/certbot:latest
-    container_name: certbot
+      - web
     restart: unless-stopped
-    volumes:
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-    networks:
-      - wagtail_network
 
-networks:
-  wagtail_network:
-    driver: bridge
+volumes:
+  static_volume:
