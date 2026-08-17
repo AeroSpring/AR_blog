@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /.git/
+Disallow: /venv/
+Allow: /
+Sitemap: https://ar-to-business.ru/sitemap.xml
