@@ -30,19 +30,21 @@ PROJECT_TITLE = "Дополненная реальность в вашем би�
 SITE_ID = 1  # или ID твоего сайта в таблице sites
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'django-insecure-rj#-z^kx3j+1ay397otg6j8m_8#v^$^$jys6&41vy^&6le)ezc'
+SECRET_KEY = 'django-insecure-rj#-z^kx3j+1ay397otg6j8m_8#v^$^$jys6&41vy^&6le)ezc'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-# ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
-
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-...')   # прочитаем из переменной окружения
-# DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 'yes')
+# Безопасность
+# SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-...')   # прочитаем из переменной окружения
+# DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = ['ar-to-business.ru', '159.194.205.233', 'localhost', '127.0.0.1']
 
 
-CSRF_TRUSTED_ORIGINS = ['https://*']
+CSRF_TRUSTED_ORIGINS = ['https://ar-to-business.ru']
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
@@ -162,7 +164,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
-
 # LANGUAGE_CODE = 'en-us'
 LANGUAGE_CODE = 'ru-ru'
 TIME_ZONE = 'UTC'
@@ -173,13 +174,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
+# MEDIA_URL = '/media/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media' 
 
 # Статика – будет в томе для nginx
 STATIC_ROOT = '/app/staticfiles'
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [ BASE_DIR / 'static' ]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

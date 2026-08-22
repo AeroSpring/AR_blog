@@ -42,7 +42,7 @@ urlpatterns = [
     # Business cards
     path('aframe/', include('business_cards.bc_aframe.urls')),
     path('babylon/', include('business_cards.bc_babylon.urls')),
-
+    
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('profile/', include('a_users.urls')),
